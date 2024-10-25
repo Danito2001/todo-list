@@ -1,7 +1,7 @@
 'use client';
 
 import { Provider } from 'react-redux'
-import {NextUIProvider} from "@nextui-org/react";
+import { NextUIProvider } from "@nextui-org/react";
 import { store } from "@/store/store";
 import { Navbar } from '../Navbar';
 

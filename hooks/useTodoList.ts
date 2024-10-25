@@ -1,36 +1,36 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 import { Tasks } from "@/types/Task";
-import { handleDeleteTodo, handleNewTodo, handlePriority, handleUpdateTodo, deleteAllTasks, toggleTaskCheck } from "@/store/actions/todoActions";
+import { 
+    handleDeleteTodo, 
+    handleNewTodo, 
+    handlePriority, 
+    handleUpdateTodo, 
+    deleteAllTasks, 
+    toggleTaskCheck,
+    setAllTaks
+} from "@/store/actions/todoActions";
 import { getPagination } from "@/utils/pagination";
+import { RootState } from "@/store/store";
 
 export const useTodoList = () => {
-    const [tasks, setTasks] = useState<Tasks[]>([]);
-    const [newTask, setNewTask] = useState<string>('');
-    const [searchTerm, setSearchTerm] = useState<string>('');
-    const [priority, setPriority] = useState<string>('All');
-    const [completes, setCompletes] = useState<string>('all'); 
-    const [selectedSort, setSelectedSort] = useState<string>('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [tasksPerPage] = useState<number>(6);
+    const tasks = useSelector((state: RootState) => state.todo.tasks);
 
-    const { tasks: todoTask } = useSelector((state: RootState) => state.todo);
+    const [ newTasks, setNewTasks ] = useState<Tasks[]>([]);
+    const [ newTask, setNewTask ] = useState<string>('');
+    const [ searchTerm, setSearchTerm ] = useState<string>('');
+    const [ priority, setPriority ] = useState<string>('All');
+    const [ completes, setCompletes ] = useState<string>('all'); 
+    const [ selectedSort, setSelectedSort ] = useState<string>('');
+    const [ currentPage, setCurrentPage ] = useState(1);
+    const [ tasksPerPage ] = useState<number>(6);
+
     const dispatch = useDispatch();
-
+    
     useEffect(() => {
-        try {
-            const storedTasks = localStorage.getItem('tasks');
-            if (storedTasks) {
-                setTasks(JSON.parse(storedTasks));
-            } else {
-                setTasks([]);
-            }
-        } catch (error) {
-            console.error("Error parsing stored tasks from localStorage:", error);
-        }
-    }, [todoTask, dispatch]);
-
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }, [tasks]);
+    
     const filteredTasks = useMemo(() => {
         return tasks.filter(task => {
             const matchedTerm = task.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -56,7 +56,7 @@ export const useTodoList = () => {
             };
     
             if (selectedSort === '') return 0;
-    
+            
             if (selectedSort === 'Low') {
                 return priorityOrder[b.priority] - priorityOrder[a.priority];
             }
@@ -76,15 +76,36 @@ export const useTodoList = () => {
         }
 
     }, [sortedTasks, currentPage, tasksPerPage]);
-    
+
+
+    const getAllTasks = useCallback(() => {
+        const storedTasks = localStorage.getItem('tasks');
+
+        try {
+            if (storedTasks) {
+                const parsedTasks = JSON.parse(storedTasks);
+                setNewTasks(parsedTasks);
+                setAllTaks(parsedTasks, dispatch);
+            } else {
+                setNewTasks([]);
+            }
+        } catch (error) {
+            console.error("Error parsing stored tasks from localStorage:", error);
+        }
+
+    }, [dispatch])
+
+    useEffect(() => {
+        getAllTasks();
+    }, [dispatch]);
 
     const addTodo = useCallback(() => {
-        handleNewTodo(tasks, setTasks, newTask, setNewTask, dispatch);
+        handleNewTodo(newTasks, setNewTasks, newTask, setNewTask, dispatch);
     }, [tasks, newTask, dispatch]);
 
     const deleteTodo = useCallback((id: number) => {
         handleDeleteTodo(id, dispatch);
-    }, [dispatch]);
+    }, [tasks]);
 
     const selectPriority = useCallback((id: number, e: React.ChangeEvent<HTMLSelectElement>) => {
         handlePriority(id, e, dispatch);
@@ -127,6 +148,7 @@ export const useTodoList = () => {
         setPriority,
         completes,
         setCompletes,
+        getAllTasks,
         selectedSort,
         setSelectedSort,
         filteredTasks: paginatedItems,
