@@ -5,22 +5,25 @@ interface Task {
     id: number;
     title: string;
     is_completed: boolean;
-    date: Date;
+    date: Date | string;
     priority: string;
 }
   
 interface TodoState {
-    tasks: Task[];
+    tasks: Task[]
 }
   
 const initialState: TodoState = {
-    tasks: JSON.parse(localStorage.getItem('tasks') || '[]')
+    tasks: []
 };
 
 export const todoSlice = createSlice({
     name: 'todo',
     initialState,
     reducers: {
+        setTodos: (state, action:PayloadAction<{tasks: Task[]}>) => {
+            state.tasks = action.payload.tasks
+        },
         addTodo: (state, action:PayloadAction<Task>) => {
             state.tasks.push(action.payload)
         },
@@ -59,6 +62,6 @@ export const todoSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addTodo, deleteTodoById, changePriority, updateTodo, deleteAllTodos, toggleCompleted } = todoSlice.actions
+export const { setTodos, addTodo, deleteTodoById, changePriority, updateTodo, deleteAllTodos, toggleCompleted } = todoSlice.actions
 
 export default todoSlice.reducer

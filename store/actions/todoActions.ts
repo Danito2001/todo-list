@@ -1,5 +1,13 @@
 import { Tasks } from "@/types/Task";
-import { addTodo, deleteTodoById, updateTodo, changePriority, deleteAllTodos, toggleCompleted } from "../todo/todoSlice";
+import { 
+    addTodo, 
+    deleteTodoById, 
+    updateTodo, 
+    changePriority, 
+    deleteAllTodos, 
+    toggleCompleted,
+    setTodos
+} from "../todo/todoSlice";
 import { AppDispatch } from "../store";
 
 export const handleNewTodo = (
@@ -10,11 +18,12 @@ export const handleNewTodo = (
     dispatch: AppDispatch
 
 ) => {
+
     const task:Tasks = {
         id: tasks.length ? tasks[tasks.length - 1].id + 1 : 1,
         title: newTask,
         is_completed: false,
-        date: new Date(),
+        date: new Date().toISOString(),
         priority: 'Med'
     }
 
@@ -24,7 +33,7 @@ export const handleNewTodo = (
 
     setTasks(updatedTasks);
 
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks) || '[]');
 
     dispatch(addTodo(task))
 
@@ -50,4 +59,8 @@ export const deleteAllTasks = (dispatch: AppDispatch) => {
 
 export const toggleTaskCheck = (id:number, dispatch: AppDispatch) => {
     dispatch(toggleCompleted({id}))
+}
+
+export const setAllTaks = (tasks:any, dispatch: AppDispatch) => {
+    dispatch(setTodos({tasks: tasks}))
 }

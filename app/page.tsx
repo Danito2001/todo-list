@@ -4,10 +4,12 @@ import { NonTask } from "@/components/NonTask";
 import { PaginationTodo } from "@/components/Pagination";
 import { TodoTask } from "@/components/TodoTask";
 import { useTodoList } from "@/hooks/useTodoList";
+import { Priority } from "@/types/Task";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
+import { useEffect } from "react";
 
 export default function Main() {
-
+	
 	const {
 		addTodo,
 		newTask,
@@ -23,8 +25,9 @@ export default function Main() {
 		selectedSort,
         setCurrentPage,
         totalPages,
-		handleSortTask
+		handleSortTask,
 	} = useTodoList();
+	
 
 	const handleSubmit = (e:React.FormEvent) => {
 		e.preventDefault();
@@ -97,7 +100,7 @@ export default function Main() {
 								title={task.title}
 								is_completed={task.is_completed}
 								date={task.date}
-								priority={task.priority}
+								priority={task.priority as Priority}
 							/>
 						)))
 					: <NonTask/>
