@@ -1,3 +1,4 @@
+import { Priority } from '@/types/Task';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
@@ -6,7 +7,7 @@ interface Task {
     title: string;
     is_completed: boolean;
     date: Date | string;
-    priority: string;
+    priority: Priority;
 }
   
 interface TodoState {
@@ -34,10 +35,10 @@ export const todoSlice = createSlice({
             state.tasks = state.tasks.filter(task => task.id !== action.payload);
             localStorage.setItem('tasks', JSON.stringify(state.tasks));
         },
-        changePriority: (state, action:PayloadAction<{id: number, priority: string}>) => {
+        changePriority: (state, action:PayloadAction<{id: number, priority: Priority | string}>) => {
             const task = state.tasks.find( task => task.id === action.payload.id)
-            if (task) {
-                task.priority = action.payload.priority
+            if (task && (action.payload.priority === 'High' || 'Med' || 'Low' )) {
+                task.priority = action.payload.priority as Priority;
             }
             localStorage.setItem('tasks', JSON.stringify(state.tasks));
         },

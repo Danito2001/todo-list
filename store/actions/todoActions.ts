@@ -12,7 +12,6 @@ import { AppDispatch } from "../store";
 
 export const handleNewTodo = (
     tasks: Tasks[],
-    setTasks: React.Dispatch<React.SetStateAction<Tasks[]>>, 
     newTask: string,
     setNewTask: React.Dispatch<React.SetStateAction<string>>, 
     dispatch: AppDispatch
@@ -30,8 +29,6 @@ export const handleNewTodo = (
     if (newTask.length <= 1 ) return;
 
     const updatedTasks = [...tasks, task];
-
-    setTasks(updatedTasks);
 
     localStorage.setItem('tasks', JSON.stringify(updatedTasks) || '[]');
 
@@ -61,6 +58,6 @@ export const toggleTaskCheck = (id:number, dispatch: AppDispatch) => {
     dispatch(toggleCompleted({id}))
 }
 
-export const setAllTaks = (tasks:any, dispatch: AppDispatch) => {
+export const setAllTaks = (tasks:Tasks[], dispatch: AppDispatch) => {
     dispatch(setTodos({tasks: tasks}))
 }

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Tasks } from "@/types/Task";
 import { 
     handleDeleteTodo, 
     handleNewTodo, 
@@ -16,7 +15,6 @@ import { RootState } from "@/store/store";
 export const useTodoList = () => {
     const tasks = useSelector((state: RootState) => state.todo.tasks);
 
-    const [ newTasks, setNewTasks ] = useState<Tasks[]>([]);
     const [ newTask, setNewTask ] = useState<string>('');
     const [ searchTerm, setSearchTerm ] = useState<string>('');
     const [ priority, setPriority ] = useState<string>('All');
@@ -24,12 +22,14 @@ export const useTodoList = () => {
     const [ selectedSort, setSelectedSort ] = useState<string>('');
     const [ currentPage, setCurrentPage ] = useState(1);
     const [ tasksPerPage ] = useState<number>(6);
-
+    
     const dispatch = useDispatch();
     
     useEffect(() => {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }, [tasks]);
+        const storedTasks = localStorage.getItem('tasks') || '[]';
+        setAllTaks(JSON.parse(storedTasks), dispatch);
+    }, []);
+
     
     const filteredTasks = useMemo(() => {
         return tasks.filter(task => {
@@ -78,29 +78,8 @@ export const useTodoList = () => {
     }, [sortedTasks, currentPage, tasksPerPage]);
 
 
-    const getAllTasks = useCallback(() => {
-        const storedTasks = localStorage.getItem('tasks');
-
-        try {
-            if (storedTasks) {
-                const parsedTasks = JSON.parse(storedTasks);
-                setNewTasks(parsedTasks);
-                setAllTaks(parsedTasks, dispatch);
-            } else {
-                setNewTasks([]);
-            }
-        } catch (error) {
-            console.error("Error parsing stored tasks from localStorage:", error);
-        }
-
-    }, [dispatch])
-
-    useEffect(() => {
-        getAllTasks();
-    }, [dispatch]);
-
     const addTodo = useCallback(() => {
-        handleNewTodo(newTasks, setNewTasks, newTask, setNewTask, dispatch);
+        handleNewTodo(tasks, newTask, setNewTask, dispatch);
     }, [tasks, newTask, dispatch]);
 
     const deleteTodo = useCallback((id: number) => {
@@ -148,7 +127,6 @@ export const useTodoList = () => {
         setPriority,
         completes,
         setCompletes,
-        getAllTasks,
         selectedSort,
         setSelectedSort,
         filteredTasks: paginatedItems,
